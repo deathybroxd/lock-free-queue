@@ -8,8 +8,6 @@ templated lock free queue
 #include <atomic>
 #include <thread>
 #include <array>
-#include <new>
-#include <optional>
 
 // T = type, N = buffer capacity
 template <typename T, size_t N>
