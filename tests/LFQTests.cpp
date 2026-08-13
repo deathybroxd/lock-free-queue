@@ -5,6 +5,7 @@
 #include <random>
 #include <vector>
 #include <cstddef>
+#include <thread>
 
 static constexpr int DEFAULT_BUFFER_CAPACITY = 1024;
 
@@ -61,5 +62,40 @@ TEST(RingBufferTest, PopTest2) {
             randomsChosen.emplace_back(randNum);
         }
         randFound = false;
+    }
+}
+
+TEST(RingBufferTest, MultithreadingTest) {
+    RingBuffer<int, DEFAULT_BUFFER_CAPACITY> rb;
+
+    std::thread producer([](RingBuffer<int, DEFAULT_BUFFER_CAPACITY>& rb){
+        int i = 0, max = 1'000'000;
+        while(i < max) {
+            if(rb.Push(i)) {
+                ++i;
+            }
+            // spin and retry at the same i
+        }
+    }, std::ref(rb));
+    
+    std::vector<int> received; 
+    std::thread consumer([](RingBuffer<int, DEFAULT_BUFFER_CAPACITY>& rb, std::vector<int>& received){
+        int count = 0, max = 1'000'000;
+        while(count < max) {
+            int val;
+            if(rb.Pop(val)) {
+                received.emplace_back(val);
+                ++count;
+            }
+            // spin and retry at the same i
+        }
+    }, std::ref(rb), std::ref(received));
+
+    producer.join();
+    consumer.join();
+
+    ASSERT_EQ(received.size(), 1'000'000);
+    for(int i{0}; i < 1'000'000; ++i) {
+        EXPECT_EQ(received.at(i), i);
     }
 }
