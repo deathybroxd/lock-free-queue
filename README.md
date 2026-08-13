@@ -6,13 +6,20 @@ This project was mainly for me to learn how to use std::atomic and some other C+
 ## Usage
 To compile:
 go to build folder
+
 type ``` cmake .. ```
+
+then:
+
 type ``` make ```
 
 To run / valgrind
 (should do nothing lmao)
+
 type ``` make run ```
+
 type ``` make val ```
 
 To test:
+
 type ``` ctest ```
